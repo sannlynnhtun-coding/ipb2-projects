@@ -1,0 +1,175 @@
+﻿@using IPB2.OnlineBusSystem.Domain.Features.Schedule
+@model GetScheduleListResponse
+@{
+    ViewData["Title"] = "Schedule Management";
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-primary mb-0"><i class="fas fa-bus-alt me-2"></i>Schedule Management</h2>
+            <p class="text-muted small mb-0">Manage bus departure and arrival schedules.</p>
+        </div>
+        <button type="button" class="btn btn-success px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#createScheduleModal">
+            <i class="fas fa-plus-circle me-1"></i> New Schedule
+        </button>
+    </div>
+        <!-- Search/Filter -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-3">
+            <form asp-action="Index" method="get" class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label for="searchDate" class="form-label small fw-bold text-uppercase text-muted">Filter by Date</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0">
+                            <i class="fas fa-calendar-day text-muted"></i>
+                        </span>
+                        <input type="date" name="searchDate" id="searchDate" class="form-control border-start-0" 
+                               value="@(string.IsNullOrEmpty(Context.Request.Query["searchDate"]) ? DateTime.Now.ToString("yyyy-MM-dd") : Context.Request.Query["searchDate"].ToString())" />
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100 shadow-sm">
+                        <i class="fas fa-filter me-1"></i> Search
+                    </button>
+                </div>
+                <div class="col-md-2">
+                    <a asp-action="Index" class="btn btn-outline-secondary w-100">
+                        <i class="fas fa-undo me-1"></i> Reset
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">All Schedule List</h3>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                    <tr>
+                        <th >Bus Info</th>
+                        <th >Route</th>
+                        <th >Date</th>
+                        <th >Departure</th>
+                        <th >Arrival</th>
+                        <th >Fare</th>
+                        <th class="text-end pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model?.Schedules != null && Model.Schedules.Any())
+                    {
+                        foreach (var schedule in Model.Schedules)
+                        {
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="fw-bold">@schedule.AvaliableBusName</div>
+                                    <div class="text-muted small">@schedule.AvaliableBusNo</div>
+                                </td>
+                                <td>@schedule.Route</td>
+                                <td>@schedule.Date.ToShortDateString()</td>
+                                <td><span class="badge bg-light text-dark border"><i class="far fa-clock me-1 text-primary"></i>@schedule.DepartureTime</span></td>
+                                <td><span class="badge bg-light text-dark border"><i class="far fa-clock me-1 text-success"></i>@schedule.ArrivalTime</span></td>
+                                <td class="fw-bold text-primary">@schedule.Fare.ToString("N0") <small>Ks</small></td>
+                                <td class="text-end pe-4">
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-sm btn-outline-primary" title="Edit"
+                                                data-bs-toggle="modal" data-bs-target="#editScheduleModal"
+                                                data-id="@schedule.Id" 
+                                                data-busid="@schedule.BusId"
+                                                data-routeid="@schedule.RouteId"
+                                                data-date="@schedule.Date.ToString("yyyy-MM-dd")"
+                                                data-departure="@schedule.DepartureTime"
+                                                data-arrival="@schedule.ArrivalTime"
+                                                data-fare="@schedule.Fare">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-danger ms-1" title="Delete"
+                                                data-bs-toggle="modal" data-bs-target="#deleteScheduleModal"
+                                                data-id="@schedule.Id" data-info="@schedule.AvaliableBusName on @schedule.Date.ToShortDateString()">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-5">
+                                <div class="text-muted mb-3">
+                                    <i class="fas fa-calendar-times fa-3x opacity-25"></i>
+                                </div>
+                                <h5 class="text-muted">No Schedules Found</h5>
+                                <p class="text-muted small">Try adjusting your date filter or create a new schedule.</p>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Modal Partials -->
+<partial name="Create" model="new UpsertScheduleRequest()" />
+<partial name="Edit" model="new UpsertScheduleRequest()" />
+<partial name="Delete" />
+
+<style>
+    .card { transition: transform 0.2s; }
+    .btn-group .btn { padding: 0.35rem 0.6rem; }
+</style>
+
+@section Scripts {
+    <script>
+        // Edit Modal Data Sync
+        const editScheduleModal = document.getElementById('editScheduleModal');
+        if (editScheduleModal) {
+            editScheduleModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                
+                const id = button.getAttribute('data-id');
+                const busId = button.getAttribute('data-busid');
+                const routeId = button.getAttribute('data-routeid');
+                const date = button.getAttribute('data-date');
+                const departure = button.getAttribute('data-departure');
+                const arrival = button.getAttribute('data-arrival');
+                const fare = button.getAttribute('data-fare');
+
+                editScheduleModal.querySelector('#editScheduleId').value = id;
+                editScheduleModal.querySelector('#editBusId').value = busId;
+                editScheduleModal.querySelector('#editRouteId').value = routeId;
+                editScheduleModal.querySelector('#editDate').value = date;
+                editScheduleModal.querySelector('#editDepartureTime').value = departure;
+                editScheduleModal.querySelector('#editArrivalTime').value = arrival;
+                editScheduleModal.querySelector('#editFare').value = fare;
+            });
+        }
+
+        // Delete Modal Data Sync
+        const deleteScheduleModal = document.getElementById('deleteScheduleModal');
+        if (deleteScheduleModal) {
+            deleteScheduleModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const id = button.getAttribute('data-id');
+                const info = button.getAttribute('data-info');
+
+                deleteScheduleModal.querySelector('#deleteScheduleId').value = id;
+                deleteScheduleModal.querySelector('#deleteScheduleInfoDisplay').textContent = info;
+            });
+        }
+    </script>
+}

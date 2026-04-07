@@ -1,0 +1,66 @@
+﻿@using IPB2.OnlineBusSystem.Domain.Features.Bus
+@model UpdateBusRequest
+<!-- Edit Bus Modal -->
+<div class="modal fade" id="editBusModal" tabindex="-1" aria-labelledby="editBusModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="editBusModalLabel"><i class="fas fa-edit me-2"></i>Edit Bus Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="Edit" asp-controller="Bus" method="post">
+                <input type="hidden" name="Id" id="editBusId" />
+                <div class="modal-body px-4 py-4">
+                    <div class="mb-4">
+                        <label asp-for="BusNo" class="form-label fw-bold small text-uppercase">Bus Number</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="fas fa-id-card text-muted"></i>
+                            </span>
+                            <input asp-for="BusNo" id="editBusNo" class="form-control border-start-0" required placeholder="e.g. 1A-1234" />
+                        </div>
+                        <span asp-validation-for="BusNo" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-4">
+                        <label asp-for="BusName" class="form-label fw-bold small text-uppercase">Bus Name</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="fas fa-bus text-muted"></i>
+                            </span>
+                            <input asp-for="BusName" id="editBusName" class="form-control border-start-0" required placeholder="e.g. Express Star" />
+                        </div>
+                        <span asp-validation-for="BusName" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-4">
+                        <label asp-for="BusType" class="form-label fw-bold small text-uppercase">Bus Type</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="fas fa-tag text-muted"></i>
+                            </span>
+                            <input asp-for="BusType" id="editBusType" class="form-control border-start-0" required placeholder="e.g. Scania VIP" />
+                        </div>
+                        <span asp-validation-for="BusType" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-0">
+                        <label asp-for="TotalSeat" class="form-label fw-bold small text-uppercase">Total Seats</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="fas fa-chair text-muted"></i>
+                            </span>
+                            <input asp-for="TotalSeat" id="editTotalSeat" class="form-control border-start-0" required min="1" placeholder="e.g. 45" />
+                        </div>
+                        <span asp-validation-for="TotalSeat" class="text-danger small"></span>
+                        <div class="form-text mt-2 small text-muted">Verify the updated capacity before saving.</div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-0 px-4 py-3">
+                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary px-4 shadow-sm">
+                        <i class="fas fa-save me-1"></i> Update Bus
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+

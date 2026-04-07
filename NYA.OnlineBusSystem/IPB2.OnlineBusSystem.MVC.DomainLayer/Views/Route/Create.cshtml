@@ -1,0 +1,48 @@
+﻿<!-- Create Route Modal -->
+<div class="modal fade" id="createRouteModal" tabindex="-1" aria-labelledby="createRouteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="createRouteModalLabel"><i class="fas fa-plus-circle me-2"></i>Add New Route</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="Create" asp-controller="Route" method="post">
+                <div class="modal-body px-4 py-4">
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-uppercase">Route Name</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="fas fa-id-card text-muted"></i>
+                            </span>
+                            <input name="RouteName" type="text" class="form-control border-start-0" required />
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-uppercase">Origin</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="fas fa-map-marker-alt text-danger"></i>
+                            </span>
+                            <input name="Origin" type="text" class="form-control border-start-0" required />
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-uppercase">Designation</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="fas fa-location-arrow text-success"></i>
+                            </span>
+                            <input name="Destination" type="text" class="form-control border-start-0" required />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-0 px-4 py-3">
+                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success px-4 shadow-sm">
+                        <i class="fas fa-save me-1"></i> Save Route
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

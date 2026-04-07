@@ -1,0 +1,163 @@
+@* @model IPB2.OnlineBusSystem.MVCApp.Models.BookingDetailResponse *@
+@model IPB2.OnlineBusSystem.Domain.Features.Booking.BookingDetailResponse
+@{
+    ViewData["Title"] = "All Bookings";
+}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-primary mb-0"><i class="fas fa-bus-alt me-2"></i>User Booking Management</h2>
+            <p class="text-muted small mb-0">Manage your customer booking details.</p>
+        </div>
+    </div>
+    <!-- Search Section -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4 bg-light rounded-3">
+            <form method="get" asp-action="BookingAllList">
+                <div class="row g-3">
+                    <div class="col-lg-7 col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="fas fa-search text-muted"></i>
+                            </span>
+
+                            <input type="text" name="txtBkSearch" id="txtBkSearch" class="form-control border-start-0 ps-0"
+                                   placeholder="Search by bus name, number or type..."
+                                   value="@Context.Request.Query["txtBkSearch"]">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100 shadow-sm">
+                            <i class="fas fa-filter me-1"></i> Search
+                        </button>
+                    </div>
+                    <div class="col-md-2">
+                        <a asp-action="BookingAllList" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-undo me-1"></i> Reset
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">All User Bookings</h3>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Travel Date</th>
+                            <th>Username</th>
+                            <th>Phone</th>
+                            <th>Bus Info</th>
+                            <th>Route</th>
+                            <th>Seat</th>
+                            <th>Fare</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.bookings != null && Model.bookings.Any())
+                        {
+                            foreach (var item in Model.bookings)
+                            {
+                                <tr>
+                                    <td>@item.TravelDate.ToShortDateString()</td>
+                                    <td>@item.Username</td>
+                                    <td>@item.Phoneno</td>
+                                    <td>
+                                        <strong>@item.BookedBusName</strong><br />
+                                        <small class="text-muted">@item.BookedBusNo (@item.BookedBusType)</small>
+                                    </td>
+                                    <td>
+                                        @item.BookedOrigin <i class="fa-solid fa-arrow-right mx-1"></i> @item.BookedDestination<br />
+                                        <small class="text-muted">@item.BookedDepartureTime - @item.BookedArrivalTime</small>
+                                    </td>
+                                    <td><span class="badge bg-info text-dark">@item.SeatNo</span></td>
+                                    <td class="fw-bold text-primary">@item.BookedFare.ToString("N0") <small>Ks</small></td>
+                                    <td>
+                                       @*  <button class="btn btn-danger btn-sm cancel-booking" data-id="@item.Id">
+                                            <i class="fa-solid fa-trash"></i> Cancel
+                                        </button> *@
+                                        <button type="button" class="btn btn-danger btn-sm cancel-booking" title="Cancel" data-id="@item.Id"
+                                                data-bs-toggle="modal" data-bs-target="#cancelBookingmodal"
+                                                >
+                                            <i class="fa-solid fa-trash"></i> Cancel
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="8" class="text-center py-4">No bookings found.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<partial name="Cancel" />
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+
+        // Edit Modal Data Sync
+        const cancelBookingmodal = document.getElementById('cancelBookingmodal');
+        if (cancelBookingmodal) {
+        cancelBookingmodal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const id = button.getAttribute('data-id');
+       
+        cancelBookingmodal.querySelector('#cancelBookingId').value = id;
+        });
+        }
+
+        // $(document).ready(function () {
+        //     $('.cancel-booking').on('click', function () {
+        //         var bookingId = $(this).data('id');
+        //         var row = $(this).closest('tr');
+
+        //         Swal.fire({
+        //             title: 'Are you sure?',
+        //             text: "You won't be able to revert this!",
+        //             icon: 'warning',
+        //             showCancelButton: true,
+        //             confirmButtonColor: '#d33',
+        //             cancelButtonColor: '#3085d6',
+        //             confirmButtonText: 'Yes, cancel it!'
+        //         }).then((result) => {
+        //             if (result.isConfirmed) {
+        //                 $.post('/Booking/Cancel', { id: bookingId }, function (response) {
+        //                     if (response.success) {
+        //                         Swal.fire(
+        //                             'Cancelled!',
+        //                             response.message,
+        //                             'success'
+        //                         );
+        //                         row.fadeOut(500, function() { $(this).remove(); });
+        //                     } else {
+        //                         Swal.fire(
+        //                             'Error!',
+        //                             response.message,
+        //                             'error'
+        //                         );
+        //                     }
+        //                 });
+        //             }
+        //         });
+        //     });
+        // });
+    </script>
+}

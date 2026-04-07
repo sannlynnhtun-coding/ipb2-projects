@@ -1,0 +1,145 @@
+﻿@using IPB2.OnlineBusSystem.Domain.Features.Booking
+@model SearchBusResponse
+@{
+    ViewData["Title"] = "Bus Booking";
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-primary mb-0">
+                <i class="fas fa-ticket-alt me-2"></i>Bus Booking
+            </h2>
+            <p class="text-muted small mb-0">Find and book your next journey.</p>
+        </div>
+    </div>
+
+    <!-- Booking Filter -->
+    <div class="card border-0 shadow-sm mb-4 bg-light">
+        <div class="card-body p-4">
+            <form asp-action="Index" method="get" class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-muted">Travel Date</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="fas fa-calendar-day text-primary"></i></span>
+                        <input type="date" name="TravelDate" class="form-control border-start-0" required 
+                               value="@(Context.Request.Query["TravelDate"].ToString() ?? DateTime.Now.ToString("yyyy-MM-dd"))" />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-muted">Origin</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="fas fa-map-marker-alt text-danger"></i></span>
+                        <select name="Origin" class="form-select border-start-0" required>
+                            <option value="">-- From --</option>
+                            @if (ViewBag.Origins != null)
+                            {
+                                foreach (var origin in (List<string>)ViewBag.Origins)
+                                {
+                                    <option value="@origin" selected="@(Context.Request.Query["Origin"] == origin)">@origin</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-muted">Destination</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="fas fa-location-arrow text-success"></i></span>
+                        <select name="Destination" class="form-select border-start-0" required>
+                            <option value="">-- To --</option>
+                            @if (ViewBag.Destinations != null)
+                            {
+                                foreach (var dest in (List<string>)ViewBag.Destinations)
+                                {
+                                    <option value="@dest" selected="@(Context.Request.Query["Destination"] == dest)">@dest</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3 gap-2">
+                    <div class="row">
+                        <div class="col-md-6 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100 shadow-sm">
+                                <i class="fas fa-search me-1"></i> Search
+                            </button>
+                        </div>
+                        <div class="col-md-6 d-flex align-items-end">
+                            <a asp-action="Index" class="btn btn-outline-secondary w-100">
+                                <i class="fas fa-undo me-1"></i> Reset
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Search Results -->
+    @if (Model?.Buss != null && Model.Buss.Any())
+    {
+        <div class="row row-cols-1 g-4 mb-5">
+            @foreach (var bus in Model.Buss)
+            {
+                <div class="col">
+                    <div class="card border-0 shadow-sm h-auto bus-card">
+                        <div class="card-body p-0">
+                            <div class="row g-0">
+                                <div class="col-md-3 bg-primary text-white p-3 d-flex flex-column justify-content-center text-center rounded-start">
+                                    <h5 class="mb-1">@bus.BusName</h5>
+                                    <div class="small opacity-75">@bus.BusNo</div>
+                                    <div class="mt-2 badge bg-white text-primary">@bus.BusType</div>
+                                </div>
+                                <div class="col-md-6 p-3">
+                                    <div class="row text-center align-items-center">
+                                        <div class="col">
+                                            <div class="h4 mb-0">@bus.DepartureTime</div>
+                                            <div class="small text-muted">Departure</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-long-arrow-alt-right fa-2x text-muted opacity-50"></i>
+                                        </div>
+                                        <div class="col">
+                                            <div class="h4 mb-0">@bus.ArrivalTime</div>
+                                            <div class="small text-muted">Arrival</div>
+                                        </div>
+                                    </div>
+                                    <hr class="my-3 opacity-10" />
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="text-muted small">
+                                            <i class="fas fa-chair me-1"></i> @bus.AvaliableSeat Seats Available
+                                        </div>
+                                        <div class="h3 mb-0 text-primary">@bus.Fare.ToString("N0") <small class="h6">Ks</small></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 p-3 d-flex align-items-center border-start bg-light rounded-end">
+                                    <a asp-action="Book" asp-route-scheduleId="@bus.secheduleId" class="btn btn-lg btn-primary w-100 shadow-sm">
+                                        <i class="fas fa-ticket-alt me-2"></i> Book Now
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else if (Context.Request.Query.ContainsKey("Origin"))
+    {
+        <div class="text-center py-5">
+            <div class="text-muted mb-3 opacity-25">
+                <i class="fas fa-bus fa-5x"></i>
+            </div>
+            <h4 class="text-muted">No Buses Found</h4>
+            <p class="text-muted small">Try different dates or routes.</p>
+        </div>
+    }
+</div>
+
+<style>
+    .bus-card { transition: all 0.3s ease; }
+    .bus-card:hover { transform: translateY(-5px); box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important; }
+</style>

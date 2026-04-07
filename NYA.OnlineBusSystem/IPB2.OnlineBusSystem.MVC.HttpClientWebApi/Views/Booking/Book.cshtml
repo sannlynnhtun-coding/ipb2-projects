@@ -1,0 +1,245 @@
+﻿@using IPB2.OnlineBusSystem.Domain.Features.Bus
+@using IPB2.OnlineBusSystem.Domain.Features.Route
+@using IPB2.OnlineBusSystem.Domain.Features.Schedule
+@model ScheduleResponse
+@{
+    ViewData["Title"] = "Confirm Booking";
+    var bus = ViewBag.Bus as BusResponse;
+    var route = ViewBag.Route as RouteResponse;
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<div class="container mt-4 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <a asp-action="Index" class="btn btn-outline-secondary shadow-sm">
+            <i class="fas fa-arrow-left me-1"></i> Back to Search
+        </a>
+        <h2 class="text-primary mb-0"><i class="fas fa-ticket-alt me-2"></i>Passenger Details</h2>
+    </div>
+
+    <div class="row g-4">
+        <!-- Trip Summary -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm sticky-top" style="top: 20px;">
+                <div class="card-header bg-dark text-white py-3">
+                    <h5 class="card-title mb-0"><i class="fas fa-info-circle me-2"></i>Trip Summary</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="mb-4">
+                        <label class="small text-muted text-uppercase fw-bold">Bus Info</label>
+                        <div class="h5 mb-1 text-primary">@bus?.BusName</div>
+                        <div class="text-muted small">@bus?.BusNo (@bus?.BusType)</div>
+                    </div>
+                    
+                    <div class="mb-4 text-center">
+                        <div class="row align-items-center">
+                            <div class="col text-start">
+                                <div class="h6 mb-0">@route?.Origin</div>
+                                <div class="small text-muted">@Model.DepartureTime</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-long-arrow-alt-right text-muted"></i>
+                            </div>
+                            <div class="col text-end">
+                                <div class="h6 mb-0">@route?.Destination</div>
+                                <div class="small text-muted">@Model.ArrivalTime</div>
+                            </div>
+                        </div>
+                        <div class="mt-2 text-primary fw-bold">@Model.Date.ToString("MMMM dd, yyyy")</div>
+                    </div>
+
+                    <div class="border-top pt-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Fare per seat</span>
+                            <span class="fw-bold">@Model.Fare.ToString("N0") Ks</span>
+                        </div>
+                        <div class="d-flex justify-content-between h5 text-primary pt-2 border-top">
+                            <span>Total Amount</span>
+                            <span id="totalAmountDisplay">0 Ks</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Passenger Form and List -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h5 class="mb-4"><i class="fas fa-user-plus me-2 text-success"></i>Add Passenger</h5>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold">Seat Number</label>
+                            <input type="number" id="passengerSeatNo" class="form-control" placeholder="e.g. 1" min="1" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">Full Name</label>
+                            <input type="text" id="passengerName" class="form-control" placeholder="John Doe" />
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label small fw-bold">Phone Number</label>
+                            <div class="input-group">
+                                <input type="text" id="passengerPhone" class="form-control" placeholder="09xxxxxxxxx" />
+                                <button type="button" id="btnAddPassenger" class="btn btn-success px-4">
+                                    <i class="fas fa-plus me-1"></i> Add
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm overflow-hidden">
+                <div class="card-header bg-light py-3 border-0">
+                    <h5 class="card-title mb-0"><i class="fas fa-users me-2 text-primary"></i>Passenger List</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0" id="passengerTable">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4">Seat</th>
+                                <th>Passenger Name</th>
+                                <th>Phone No.</th>
+                                <th class="text-end pe-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="passengerListBody">
+                            <tr id="emptyRow">
+                                <td colspan="4" class="text-center py-5 text-muted">
+                                    <div class="mb-2"><i class="fas fa-user-slash fa-2x opacity-25"></i></div>
+                                    <p class="mb-0 small">No passengers added to this booking yet.</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer bg-white p-4 text-end border-0">
+                    <input type="hidden" id="currentScheduleId" value="@Model.Id" />
+                    <input type="hidden" id="farePerSeat" value="@Model.Fare" />
+                    
+                    <button type="button" id="btnSubmitBooking" class="btn btn-primary btn-lg px-5 shadow-sm" disabled>
+                        <i class="fas fa-check-circle me-1"></i> Confirm & Book Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let passengers = [];
+    let editIndex = -1;
+    const farePerSeat = parseInt(document.getElementById('farePerSeat').value);
+
+    document.getElementById('btnAddPassenger').addEventListener('click', function () {
+        const seatNo = document.getElementById('passengerSeatNo').value;
+        const name = document.getElementById('passengerName').value;
+        const phone = document.getElementById('passengerPhone').value;
+
+        if (!seatNo || !name || !phone) {
+            alert('Please fill all passenger details.');
+            return;
+        }
+
+        if (editIndex === -1) {
+            passengers.push({ seatNo: parseInt(seatNo), username: name, phoneno: phone });
+        } else {
+            passengers[editIndex] = { seatNo: parseInt(seatNo), username: name, phoneno: phone };
+            editIndex = -1;
+            this.innerHTML = '<i class="fas fa-plus me-1"></i> Add';
+            this.className = 'btn btn-success px-4';
+        }
+
+        clearInputs();
+        renderPassengers();
+    });
+
+    function clearInputs() {
+        document.getElementById('passengerSeatNo').value = '';
+        document.getElementById('passengerName').value = '';
+        document.getElementById('passengerPhone').value = '';
+    }
+
+    function renderPassengers() {
+        const body = document.getElementById('passengerListBody');
+        body.innerHTML = '';
+
+        if (passengers.length === 0) {
+            body.innerHTML = '<tr id="emptyRow"><td colspan="4" class="text-center py-5 text-muted"><div class="mb-2"><i class="fas fa-user-slash fa-2x opacity-25"></i></div><p class="mb-0 small">No passengers added to this booking yet.</p></td></tr>';
+            document.getElementById('btnSubmitBooking').disabled = true;
+            document.getElementById('totalAmountDisplay').textContent = '0 Ks';
+            return;
+        }
+
+        document.getElementById('btnSubmitBooking').disabled = false;
+        let total = passengers.length * farePerSeat;
+        document.getElementById('totalAmountDisplay').textContent = total.toLocaleString() + ' Ks';
+
+        passengers.forEach((p, index) => {
+            const row = `
+                <tr>
+                    <td class="ps-4"><span class="badge bg-light text-primary border border-primary px-3 py-2">Seat #${p.seatNo}</span></td>
+                    <td class="fw-bold">${p.username}</td>
+                    <td class="text-muted">${p.phoneno}</td>
+                    <td class="text-end pe-4">
+                        <button class="btn btn-sm btn-outline-info me-1" onclick="editPassenger(${index})"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="removePassenger(${index})"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `;
+            body.insertAdjacentHTML('beforeend', row);
+        });
+    }
+
+    window.removePassenger = function(index) {
+        passengers.splice(index, 1);
+        renderPassengers();
+    };
+
+    window.editPassenger = function(index) {
+        const p = passengers[index];
+        document.getElementById('passengerSeatNo').value = p.seatNo;
+        document.getElementById('passengerName').value = p.username;
+        document.getElementById('passengerPhone').value = p.phoneno;
+        
+        editIndex = index;
+        const btn = document.getElementById('btnAddPassenger');
+        btn.innerHTML = '<i class="fas fa-check me-1"></i> Update';
+        btn.className = 'btn btn-primary px-4';
+    };
+
+    document.getElementById('btnSubmitBooking').addEventListener('click', async function() {
+        const scheduleId = document.getElementById('currentScheduleId').value;
+        const request = {
+            ScheduleId: scheduleId,
+            Passengers: passengers
+        };
+
+        const btn = this;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Processing...';
+
+        try {
+            const response = await fetch('/Booking/Create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(request)
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                alert(result.message);
+                window.location.href = '/Booking/Index';
+            } else {
+                alert('Error: ' + result.message);
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-check-circle me-1"></i> Confirm & Book Now';
+            }
+        } catch (error) {
+            alert('Failed to submit booking. Please try again.');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-check-circle me-1"></i> Confirm & Book Now';
+        }
+    });
+</script>

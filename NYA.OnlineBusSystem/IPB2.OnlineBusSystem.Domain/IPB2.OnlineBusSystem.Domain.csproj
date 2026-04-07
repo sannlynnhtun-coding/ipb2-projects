@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Features\Bus\" />
+    <Folder Include="Features\Booking\" />
+    <Folder Include="Features\Schedule\" />
+    <Folder Include="Features\Route\" />
+  </ItemGroup>
+
+  <ItemGroup>
+	  <FrameworkReference Include="Microsoft.AspNetCore.App" />
+	  <PackageReference Include="Dapper" Version="2.1.66" />
+    <ProjectReference Include="..\IPB2.OnlineBusSystem.Database\IPB2.OnlineBusSystem.Database.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,10 @@
+<Solution>
+  <Project Path="IPB2.NorthwindCharts.Database/IPB2.NorthwindCharts.Database.csproj" />
+  <Project Path="IPB2.NorthwindCharts.Mvc/IPB2.NorthwindCharts.Mvc.csproj" />
+  <Project Path="IPB2.OnlineBusSystem.Database/IPB2.OnlineBusSystem.Database.csproj" />
+  <Project Path="IPB2.OnlineBusSystem.Domain/IPB2.OnlineBusSystem.Domain.csproj" />
+  <Project Path="IPB2.OnlineBusSystem.MVC.DomainLayer/IPB2.OnlineBusSystem.MVC.csproj" />
+  <Project Path="IPB2.OnlineBusSystem.MVC.HttpClientWebApi/IPB2.OnlineBusSystem.MVC.HttpClientWebApi.csproj" Id="8adb4a6a-ceed-45c3-9442-e8d050f2de6e" />
+  <Project Path="IPB2.OnlineBusSystem.WebApi/IPB2.OnlineBusSystem.WebApi.csproj" />
+  <Project Path="IPB2.OnlineBusSystem.WindowFormApp/IPB2.OnlineBusSystem.WindowFormApp.csproj" />
+</Solution>

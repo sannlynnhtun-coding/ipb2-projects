@@ -1,0 +1,58 @@
+﻿<!-- Create Bus Modal -->
+<div class="modal fade" id="createBusModal" tabindex="-1" aria-labelledby="createBusModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="createBusModalLabel"><i class="fas fa-plus-circle me-2"></i>Add New Bus</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="Create" asp-controller="Bus" method="post">
+                <div class="modal-body px-4 py-4">
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-uppercase">Bus Number</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="fas fa-id-card text-muted"></i>
+                            </span>
+                            <input name="BusNo" type="text" class="form-control border-start-0" required placeholder="e.g. 1A-1234" />
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-uppercase">Bus Name</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="fas fa-bus text-muted"></i>
+                            </span>
+                            <input name="BusName" type="text" class="form-control border-start-0" required placeholder="e.g. Express Star" />
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-uppercase">Bus Type</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="fas fa-tag text-muted"></i>
+                            </span>
+                            <input name="BusType" type="text" class="form-control border-start-0" required placeholder="e.g. Scania VIP" />
+                        </div>
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label fw-bold small text-uppercase">Total Seats</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="fas fa-chair text-muted"></i>
+                            </span>
+                            <input name="TotalSeat" type="number" class="form-control border-start-0" required min="1" placeholder="e.g. 45" />
+                        </div>
+                        <div class="form-text mt-2 small text-muted">Verify the total capacity before saving.</div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-0 px-4 py-3">
+                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success px-4 shadow-sm">
+                        <i class="fas fa-save me-1"></i> Save Bus
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
