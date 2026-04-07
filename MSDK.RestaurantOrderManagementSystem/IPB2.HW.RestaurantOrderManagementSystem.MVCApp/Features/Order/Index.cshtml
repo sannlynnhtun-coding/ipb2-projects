@@ -1,0 +1,73 @@
+@model IPB2.HW.RestaurantOrderManagementSystem.Domain.Features.Order.OrderListResponse
+
+@{
+    ViewData["Title"] = "Orders";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="display-6 fw-bold text-dark">Orders</h2>
+        <a asp-action="Create" class="btn btn-dark btn-lg shadow-sm">
+            <i class="bi bi-cart-plus"></i> Place New Order
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="bg-light text-secondary text-uppercase small fw-bold">
+                    <tr>
+                        <th class="ps-4">Order ID</th>
+                        <th>Date</th>
+                        <th>Table</th>
+                        <th>Status</th>
+                        <th>Items Count</th>
+                        <th class="text-end pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Data)
+                    {
+                        <tr>
+                            <td class="ps-4 fw-medium text-dark">#@item.OrderId</td>
+                            <td class="text-dark">@item.OrderDate?.ToString("MMM dd, yyyy HH:mm")</td>
+                            <td class="text-dark"><span class="badge bg-secondary rounded-pill px-3">Table @item.TableNumber</span></td>
+                            <td>
+                                @if (item.Status == "Pending")
+                                {
+                                    <span class="badge bg-warning-subtle text-warning-emphasis rounded-pill px-3 py-1">Pending</span>
+                                }
+                                else if (item.Status == "Completed")
+                                {
+                                    <span class="badge bg-success-subtle text-success-emphasis rounded-pill px-3 py-1">Completed</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-info-subtle text-info-emphasis rounded-pill px-3 py-1">@item.Status</span>
+                                }
+                            </td>
+                            <td>@item.OrderItems?.Count items</td>
+                            <td class="text-end pe-4">
+                                <a asp-action="Delete" asp-route-id="@item.OrderId" class="btn btn-outline-danger btn-sm border-0" onclick="return confirm('Cancel this order?')">
+                                    <i class="bi bi-trash3"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            @for (int i = 1; i <= Model.PageCount; i++)
+            {
+                <li class="page-item @(i == Model.PageNo ? "active" : "")">
+                    <a class="page-link shadow-sm mx-1 rounded-3" asp-action="Index" asp-route-pageNo="@i">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
+</div>

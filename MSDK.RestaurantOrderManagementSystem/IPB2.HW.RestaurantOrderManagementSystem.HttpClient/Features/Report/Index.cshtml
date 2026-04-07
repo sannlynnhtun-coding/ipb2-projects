@@ -1,0 +1,100 @@
+@model IPB2.HW.RestaurantOrderManagementSystem.Domain.Features.Report.SalesReportResponse
+
+@{
+    ViewData["Title"] = "Sales Report";
+    var totalRevenue = Model.Data?.Sum(x => x.TotalRevenue) ?? 0;
+    var totalOrders = Model.Data?.Sum(x => x.TotalOrders) ?? 0;
+}
+
+<div class="container mt-4 pb-5">
+    <div class="row align-items-center mb-4">
+        <div class="col-md-6">
+            <h2 class="display-6 fw-bold text-dark"><i class="bi bi-graph-up-arrow text-success"></i> Sales Report</h2>
+        </div>
+        <div class="col-md-6">
+            <form method="get" class="row g-2 justify-content-end">
+                <div class="col-auto">
+                    <input type="date" name="startDate" value="@ViewBag.StartDate" class="form-control border-2 shadow-sm" />
+                </div>
+                <div class="col-auto pt-2 text-secondary">to</div>
+                <div class="col-auto">
+                    <input type="date" name="endDate" value="@ViewBag.EndDate" class="form-control border-2 shadow-sm" />
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-dark shadow-sm px-4">Filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row mb-4 g-4">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 bg-primary text-white p-4">
+                <div class="d-flex align-items-center">
+                    <div class="rounded-circle bg-white bg-opacity-25 p-3 me-3">
+                        <i class="bi bi-currency-dollar fs-2"></i>
+                    </div>
+                    <div>
+                        <span class="text-white bg-opacity-75 small fw-bold text-uppercase">Total Revenue</span>
+                        <h2 class="fw-bold mb-0">$@totalRevenue.ToString("N2")</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 bg-success text-white p-4">
+                <div class="d-flex align-items-center">
+                    <div class="rounded-circle bg-white bg-opacity-25 p-3 me-3">
+                        <i class="bi bi-cart-check fs-2"></i>
+                    </div>
+                    <div>
+                        <span class="text-white bg-opacity-75 small fw-bold text-uppercase">Total Orders</span>
+                        <h2 class="fw-bold mb-0">@totalOrders</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="bg-light text-secondary text-uppercase small fw-bold">
+                    <tr>
+                        <th class="ps-4 py-3">Date</th>
+                        <th class="py-3">Orders</th>
+                        <th class="py-3">Revenue</th>
+                        <th class="text-end pe-4 py-3">Performance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Data != null && Model.Data.Any())
+                    {
+                        foreach (var item in Model.Data)
+                        {
+                            <tr>
+                                <td class="ps-4 fw-medium text-dark">@item.Date.ToString("MMMM dd, yyyy")</td>
+                                <td class="fw-bold text-dark">@item.TotalOrders</td>
+                                <td class="text-success fw-bold">$@item.TotalRevenue.ToString("N2")</td>
+                                <td class="text-end pe-4">
+                                    <div class="progress" style="height: 10px; border-radius: 5px;">
+                                        @{
+                                            var percent = (item.TotalRevenue / (totalRevenue > 0 ? totalRevenue : 1)) * 100;
+                                        }
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: @percent%"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center py-5 text-muted">No data found for the selected period.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
