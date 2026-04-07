@@ -1,0 +1,101 @@
+@using IPB2.HW.RestaurantOrderManagementSystem.Domain.Features.Menu
+@model IPB2.HW.RestaurantOrderManagementSystem.Domain.Features.Order.CreateOrderRequest
+
+@{
+    ViewData["Title"] = "Place Order";
+    var menuItems = ViewBag.MenuItems as List<MenuItemDto>;
+}
+
+<div class="container mt-5 pb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card border-0 shadow-lg rounded-4">
+                <div class="card-body p-5">
+                    <h2 class="fw-bold text-center mb-4">New Order</h2>
+                    <form asp-action="Save" method="post" id="orderForm">
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="TableNumber" class="form-label text-dark small fw-bold text-uppercase">Table Number</label>
+                                <input asp-for="TableNumber" type="number" class="form-control form-control-lg border-2" placeholder="e.g. 5" required />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Status" class="form-label text-dark small fw-bold text-uppercase">Status</label>
+                                <select asp-for="Status" class="form-select form-select-lg border-2">
+                                    <option value="Pending">Pending</option>
+                                    <option value="Processing">Processing</option>
+                                    <option value="Completed">Completed</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4 class="fw-bold text-primary mb-0">Order Items</h4>
+                            <button type="button" class="btn btn-outline-primary btn-sm shadow-sm" onclick="addItem()">
+                                <i class="bi bi-plus-lg"></i> Add Item
+                            </button>
+                        </div>
+
+                        <div id="itemsContainer">
+                            <!-- Dynamic items will be added here -->
+                        </div>
+
+                        <div class="d-grid gap-2 mt-5">
+                            <button type="submit" class="btn btn-primary btn-lg shadow-sm">Confirm Order</button>
+                            <a asp-action="Index" class="btn btn-light btn-lg text-dark">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let itemIndex = 0;
+        const menuItems = @Html.Raw(Json.Serialize(menuItems));
+
+        function addItem() {
+            const container = document.getElementById('itemsContainer');
+            const row = document.createElement('div');
+            row.className = 'row g-3 mb-3 align-items-end animate__animated animate__fadeIn';
+            row.innerHTML = `
+                <div class="col-md-5">
+                    <label class="form-label small text-dark fw-bold">Menu Item</label>
+                    <select name="OrderItems[${itemIndex}].MenuItemId" class="form-select border-2" onchange="updatePrice(this, ${itemIndex})" required>
+                        <option value="">-- Select Item --</option>
+                        ${menuItems.map(item => `<option value="${item.menuItemId}" data-price="${item.price}">${item.name} - $${item.price}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small text-dark fw-bold">Quantity</label>
+                    <input name="OrderItems[${itemIndex}].Quantity" type="number" min="1" value="1" class="form-control border-2" required />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small text-dark fw-bold">Price ($)</label>
+                    <input name="OrderItems[${itemIndex}].Price" type="number" step="0.01" class="form-control border-2 bg-light font-monospace" readonly />
+                </div>
+                <div class="col-md-1">
+                    <button type="button" class="btn btn-outline-danger border-0" onclick="this.parentElement.parentElement.remove()">
+                        <i class="bi bi-trash-fill"></i>
+                    </button>
+                </div>
+            `;
+            container.appendChild(row);
+            itemIndex++;
+        }
+
+        function updatePrice(select, index) {
+            const price = select.options[select.selectedIndex].getAttribute('data-price');
+            const priceInput = document.querySelector(`input[name="OrderItems[${index}].Price"]`);
+            if (priceInput) {
+                priceInput.value = price || 0;
+            }
+        }
+
+        // Add first item by default
+        window.onload = addItem;
+    </script>
+}

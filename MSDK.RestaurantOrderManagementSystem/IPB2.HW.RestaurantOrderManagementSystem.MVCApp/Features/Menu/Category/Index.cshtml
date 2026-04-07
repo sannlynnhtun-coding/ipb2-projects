@@ -1,0 +1,59 @@
+@model IPB2.HW.RestaurantOrderManagementSystem.Domain.Features.Menu.CategoryListResponse
+
+@{
+    ViewData["Title"] = "Categories";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="display-6 fw-bold text-primary">Categories</h2>
+        <a asp-action="CategoryCreate" class="btn btn-primary btn-lg shadow-sm">
+            <i class="bi bi-plus-lg"></i> Add New Category
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="bg-light text-secondary text-uppercase small fw-bold">
+                    <tr>
+                        <th class="ps-4">ID</th>
+                        <th>Category Name</th>
+                        <th class="text-end pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Data)
+                    {
+                        <tr>
+                            <td class="ps-4 fw-medium text-dark">@item.CategoryId</td>
+                            <td>
+                                <span class="fw-bold text-dark">@item.CategoryName</span>
+                            </td>
+                            <td class="text-end pe-4">
+                                <a asp-action="CategoryEdit" asp-route-id="@item.CategoryId" class="btn btn-outline-warning btn-sm border-0 me-2" title="Edit">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <a asp-action="CategoryDelete" asp-route-id="@item.CategoryId" class="btn btn-outline-danger btn-sm border-0" onclick="return confirm('Are you sure you want to delete this category?')" title="Delete">
+                                    <i class="bi bi-trash3"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            @for (int i = 1; i <= Model.PageCount; i++)
+            {
+                <li class="page-item @(i == Model.PageNo ? "active" : "")">
+                    <a class="page-link shadow-sm mx-1 rounded-3" asp-action="CategoryIndex" asp-route-pageNo="@i">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
+</div>
