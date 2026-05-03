@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="IBP2.StudentResultManagementSystemMiminalApi/IBP2.StudentResultManagementSystemMiminalApi.csproj" Id="e432d9cf-3899-491c-bd4b-e1da9dcb3c5f" />
+  <Project Path="IBP2.StudentResultManagementSystemMVC/IBP2.StudentResultManagementSystemMVC.csproj" Id="8eef4a37-8630-4efe-94ce-7b7c91b980b8" />
+  <Project Path="IBP2.StudentResultManagementSystemWebApi.Database/IBP2.StudentResultManagementSystemWebApi.Database.csproj" Id="54a4a5cc-7532-437c-bdbf-cc63a4874111" />
+  <Project Path="IBP2.StudentResultManagementSystemWebApi/IBP2.StudentResultManagementSystemWebApi.csproj" />
+</Solution>
